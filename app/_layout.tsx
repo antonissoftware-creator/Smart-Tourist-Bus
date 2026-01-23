@@ -21,7 +21,7 @@ export default function RootLayout() {
         >
           <Stack.Screen
             name="(tabs)/index"
-            options={{ title: "Smart Tourist Bus" }}
+            options={{ title: "Smart Tourist Bus", headerShown: false }}
           />
           <Stack.Screen
             name="(tabs)/climate-control/index"
