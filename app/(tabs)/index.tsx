@@ -1,95 +1,163 @@
-import { Link } from "expo-router";
-import { ScrollView, Text, View } from "react-native";
+import { useMemo } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useRouter } from "expo-router";
 
-import { useThemeColor } from "@/hooks/use-theme-color";
 import { styles } from "@/constants/home-styles";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import type { HomeCardStyleProps, HomeSampleCard } from "@/types/home";
+
+const SAMPLE_CARDS: HomeSampleCard[] = [
+  {
+    id: "sample-1",
+    title: "Μικρή βόλτα στην Πλάκα",
+    description: "Παραδοσιακά σοκάκια και θέα στην Ακρόπολη.",
+    tag: "Προτεινόμενο",
+    route: "/(tabs)/passenger/nearby-attractions",
+  },
+  {
+    id: "sample-2",
+    title: "Freddo από το onboard cafe",
+    description: "Δροσερός espresso για τη διαδρομή σου.",
+    tag: "Ρόφημα",
+    route: "/(tabs)/passenger/cafe-orders",
+  },
+  {
+    id: "sample-3",
+    title: "Γρήγορη στάση για φωτογραφίες",
+    description: "Κλείσε 10 λεπτά για το καλύτερο κάδρο.",
+    tag: "Στάση",
+    route: "/(tabs)/passenger/route-view",
+  },
+  {
+    id: "sample-4",
+    title: "Αξιοθέατο στα 300 μέτρα",
+    description: "Ιδανικό για άμεση εξερεύνηση.",
+    tag: "Κοντά",
+    route: "/(tabs)/passenger/city-navigation",
+  },
+  {
+    id: "sample-5",
+    title: "Snack στο δρόμο",
+    description: "Ελαφρύ, γρήγορο και νόστιμο.",
+    tag: "Snack",
+    route: "/(tabs)/passenger/cafe-orders",
+  },
+];
 
 export default function Index() {
+  const router = useRouter();
   const backgroundColor = useThemeColor({}, "background");
   const textColor = useThemeColor({}, "text");
   const mutedTextColor = useThemeColor({}, "mutedText");
   const tintColor = useThemeColor({}, "tint");
+  const borderColor = useThemeColor({}, "border");
+  const surfaceColor = useThemeColor({}, "surface");
+  const surfaceMutedColor = useThemeColor({}, "surfaceMuted");
+
+  const cardStyles = useMemo(
+    () =>
+      createCardStyles({
+        textColor,
+        mutedTextColor,
+        tintColor,
+        borderColor,
+        surfaceColor,
+        surfaceMutedColor,
+      }),
+    [textColor, mutedTextColor, tintColor, borderColor, surfaceColor, surfaceMutedColor]
+  );
+
+  const randomizedCards = useMemo(() => {
+    const shuffled = [...SAMPLE_CARDS].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 3);
+  }, []);
 
   return (
     <ScrollView
       style={{ backgroundColor }}
       contentContainerStyle={styles.container}
     >
-      <Text style={[styles.title, { color: textColor }]}>
-        Smart Tourist Bus
-      </Text>
-      <Text style={[styles.subtitle, { color: mutedTextColor }]}>
-        Choose a destination to explore.
+      <Text style={[styles.title, { color: textColor }, styles.border_bottom]}>
+        Εξερεύνησε τη στάση σου
       </Text>
 
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: textColor }]}>
-          Core Systems
+          Δείγματα καρτών
         </Text>
-        <Link href="/driver" style={[styles.link, { color: tintColor }]}>
-          Driver Console
-        </Link>
-        <Link
-          href="/driver/assistance"
-          style={[styles.link, { color: tintColor }]}
-        >
-          Driver Assistance
-        </Link>
-        <Link href="/climate-control" style={[styles.link, { color: tintColor }]}>
-          Climate Control
-        </Link>
-        <Link href="/energy-dashboard" style={[styles.link, { color: tintColor }]}>
-          Energy Dashboard
-        </Link>
-        <Link href="/robot-vacuum" style={[styles.link, { color: tintColor }]}>
-          Robot Vacuum
-        </Link>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: textColor }]}>
-          Passenger Experience
-        </Text>
-        <Link href="/passenger" style={[styles.link, { color: tintColor }]}>
-          Passenger Hub
-        </Link>
-        <Link
-          href="/passenger/nearby-attractions"
-          style={[styles.link, { color: tintColor }]}
-        >
-          Nearby Attractions
-        </Link>
-        <Link
-          href="/passenger/route-view"
-          style={[styles.link, { color: tintColor }]}
-        >
-          Route View
-        </Link>
-        <Link
-          href="/passenger/city-navigation"
-          style={[styles.link, { color: tintColor }]}
-        >
-          City Navigation
-        </Link>
-        <Link
-          href="/passenger/cafe-orders"
-          style={[styles.link, { color: tintColor }]}
-        >
-          Cafe Orders
-        </Link>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: textColor }]}>
-          Operations
-        </Text>
-        <Link href="/employee-control" style={[styles.link, { color: tintColor }]}>
-          Employee Control
-        </Link>
-        <Link href="/interactions" style={[styles.link, { color: tintColor }]}>
-          Rider Interactions
-        </Link>
+        <View style={cardStyles.cardGrid}>
+          {randomizedCards.map((card) => (
+            <Pressable
+              key={card.id}
+              accessibilityRole="button"
+              onPress={() => {
+                if (card.route) {
+                  router.push(card.route);
+                }
+              }}
+              style={({ pressed }) => [
+                cardStyles.card,
+                pressed && cardStyles.cardPressed,
+              ]}
+            >
+              <View style={cardStyles.tagPill}>
+                <Text style={cardStyles.tagText}>{card.tag}</Text>
+              </View>
+              <Text style={cardStyles.cardTitle}>{card.title}</Text>
+              <Text style={cardStyles.cardBody}>{card.description}</Text>
+            </Pressable>
+          ))}
+        </View>
       </View>
     </ScrollView>
   );
 }
+
+const createCardStyles = ({
+  textColor,
+  mutedTextColor,
+  tintColor,
+  borderColor,
+  surfaceColor,
+  surfaceMutedColor,
+}: HomeCardStyleProps) =>
+  StyleSheet.create({
+    cardGrid: {
+      gap: 12,
+    },
+    card: {
+      backgroundColor: surfaceColor,
+      borderRadius: 14,
+      borderWidth: 1,
+      borderColor,
+      padding: 14,
+      gap: 8,
+    },
+    cardPressed: {
+      opacity: 0.92,
+      transform: [{ scale: 0.99 }],
+    },
+    tagPill: {
+      alignSelf: "flex-start",
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      borderRadius: 999,
+      backgroundColor: surfaceMutedColor,
+      borderWidth: 1,
+      borderColor,
+    },
+    tagText: {
+      fontSize: 12,
+      fontWeight: "700",
+      color: tintColor,
+    },
+    cardTitle: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: textColor,
+    },
+    cardBody: {
+      fontSize: 13,
+      color: mutedTextColor,
+    },
+  });

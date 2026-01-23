@@ -9,6 +9,7 @@ export const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "700",
+    textAlign: "center"
   },
   subtitle: {
     fontSize: 14,
@@ -24,4 +25,8 @@ export const styles = StyleSheet.create({
   link: {
     fontSize: 15,
   },
+  border_bottom: {
+    borderBottomColor: "#C67C4E",
+    borderBottomWidth: 2
+  }
 });
