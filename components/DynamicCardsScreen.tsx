@@ -24,6 +24,7 @@ import type {
   PlaceCardProps,
   ProductCardProps,
   CardRendererProps,
+  PlaceCardsRowProps,
   TabsProps,
   CardTheme,
 } from "@/types/cards";
@@ -273,6 +274,102 @@ const createStyles = (theme: CardTheme) =>
     },
     addBtnPressed: { opacity: 0.9 },
   });
+
+export function PlaceCardsRow({
+  places,
+  layout = "horizontal",
+  fullWidth = false,
+}: PlaceCardsRowProps) {
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
+  const mutedTextColor = useThemeColor({}, "mutedText");
+  const tintColor = useThemeColor({}, "tint");
+  const borderColor = useThemeColor({}, "border");
+  const surfaceColor = useThemeColor({}, "surface");
+  const surfaceMutedColor = useThemeColor({}, "surfaceMuted");
+  const iconColor = useThemeColor({}, "icon");
+
+  const theme = useMemo<CardTheme>(
+    () => ({
+      backgroundColor,
+      textColor,
+      mutedTextColor,
+      tintColor,
+      borderColor,
+      surfaceColor,
+      surfaceMutedColor,
+      iconColor,
+    }),
+    [
+      backgroundColor,
+      textColor,
+      mutedTextColor,
+      tintColor,
+      borderColor,
+      surfaceColor,
+      surfaceMutedColor,
+      iconColor,
+    ]
+  );
+
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
+  const MetaDotRow = ({ left, right }: MetaDotRowProps) => {
+    if (!left && !right) return null;
+    return (
+      <View style={styles.metaRow}>
+        {left ? <Text style={styles.metaText}>{left}</Text> : null}
+        {left && right ? <Text style={styles.metaDot}>|</Text> : null}
+        {right ? <Text style={styles.metaText}>{right}</Text> : null}
+      </View>
+    );
+  };
+
+  const PlaceCard = ({ item }: PlaceCardProps) => (
+    <Pressable
+      onPress={item.onPress}
+      style={({ pressed }) => [
+        styles.placeCard,
+        fullWidth && localStyles.placeCardFull,
+        pressed && styles.pressed,
+      ]}
+    >
+      <Image source={{ uri: item.imageUrl }} style={styles.placeImage} />
+      <View style={styles.placeBody}>
+        <Text numberOfLines={1} style={styles.placeTitle}>
+          {item.title}
+        </Text>
+        <MetaDotRow left={item.metaLeft} right={item.metaRight} />
+      </View>
+    </Pressable>
+  );
+
+  if (layout === "vertical") {
+    return (
+      <View style={localStyles.verticalList}>
+        {places.map((place) => (
+          <PlaceCard key={place.id} item={place} />
+        ))}
+      </View>
+    );
+  }
+
+  return (
+    <FlatList
+      data={places}
+      keyExtractor={(item) => item.id}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={{ gap: 14, paddingRight: 8 }}
+      renderItem={({ item }) => <PlaceCard item={item} />}
+    />
+  );
+}
+
+const localStyles = StyleSheet.create({
+  verticalList: { gap: 14 },
+  placeCardFull: { width: "100%" },
+});
 
 export default function DynamicCardsScreen() {
   const backgroundColor = useThemeColor({}, "background");

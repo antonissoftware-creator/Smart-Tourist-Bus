@@ -63,6 +63,14 @@ export type CardRendererProps = {
   item: CardItem;
 };
 
+export type PlaceCardsLayout = "horizontal" | "vertical";
+
+export type PlaceCardsRowProps = {
+  places: PlaceCardItem[];
+  layout?: PlaceCardsLayout;
+  fullWidth?: boolean;
+};
+
 export type TabsProps = {
   tabs: Tab[];
   activeId: string;
