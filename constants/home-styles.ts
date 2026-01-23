@@ -3,7 +3,6 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    padding: 24,
     gap: 12,
   },
   title: {
@@ -17,6 +16,12 @@ export const styles = StyleSheet.create({
   section: {
     marginTop: 16,
     gap: 10,
+    flexGrow: 1,
+    padding: 24,
+  },
+  svgBottom: {
+    marginTop: "auto",
+    alignItems: "center",
   },
   sectionTitle: {
     fontSize: 16,

@@ -1,7 +1,9 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useMemo } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { useRouter } from "expo-router";
 
+import AthensSVG from "@/assets/svgs/Athens.svg";
 import { styles } from "@/constants/home-styles";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import type { HomeCardStyleProps, HomeSampleCard } from "@/types/home";
@@ -9,37 +11,26 @@ import type { HomeCardStyleProps, HomeSampleCard } from "@/types/home";
 const SAMPLE_CARDS: HomeSampleCard[] = [
   {
     id: "sample-1",
-    title: "Μικρή βόλτα στην Πλάκα",
-    description: "Παραδοσιακά σοκάκια και θέα στην Ακρόπολη.",
-    tag: "Προτεινόμενο",
-    route: "/(tabs)/passenger/nearby-attractions",
+    title: "Ζωντανή Θέα",
+    description: "Απόλαυσε τη διαδρομή σε πραγματικό χρόνο.",
+    tag: "Ζωντανά",
+    iconName: "eye",
+    route: "/(tabs)/passenger",
   },
   {
     id: "sample-2",
-    title: "Freddo από το onboard cafe",
-    description: "Δροσερός espresso για τη διαδρομή σου.",
-    tag: "Ρόφημα",
-    route: "/(tabs)/passenger/cafe-orders",
+    title: "Κοντινά αξιοθέατα",
+    description: "Δες τα σημεία ενδιαφέροντος δίπλα σου.",
+    tag: "Αξιοθέατα",
+    iconName: "binoculars",
+    route: "/(tabs)/passenger/nearby-attractions",
   },
   {
     id: "sample-3",
-    title: "Γρήγορη στάση για φωτογραφίες",
-    description: "Κλείσε 10 λεπτά για το καλύτερο κάδρο.",
-    tag: "Στάση",
-    route: "/(tabs)/passenger/route-view",
-  },
-  {
-    id: "sample-4",
-    title: "Αξιοθέατο στα 300 μέτρα",
-    description: "Ιδανικό για άμεση εξερεύνηση.",
-    tag: "Κοντά",
-    route: "/(tabs)/passenger/city-navigation",
-  },
-  {
-    id: "sample-5",
-    title: "Snack στο δρόμο",
-    description: "Ελαφρύ, γρήγορο και νόστιμο.",
-    tag: "Snack",
+    title: "Παραγγελία Ροφήματος",
+    description: "Παράγγειλε ρόφημα πριν την επόμενη στάση.",
+    tag: "Ρόφημα",
+    iconName: "coffee",
     route: "/(tabs)/passenger/cafe-orders",
   },
 ];
@@ -64,7 +55,14 @@ export default function Index() {
         surfaceColor,
         surfaceMutedColor,
       }),
-    [textColor, mutedTextColor, tintColor, borderColor, surfaceColor, surfaceMutedColor]
+    [
+      textColor,
+      mutedTextColor,
+      tintColor,
+      borderColor,
+      surfaceColor,
+      surfaceMutedColor,
+    ],
   );
 
   const randomizedCards = useMemo(() => {
@@ -77,13 +75,24 @@ export default function Index() {
       style={{ backgroundColor }}
       contentContainerStyle={styles.container}
     >
-      <Text style={[styles.title, { color: textColor }, styles.border_bottom]}>
-        Εξερεύνησε τη στάση σου
-      </Text>
-
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: textColor }]}>
-          Δείγματα καρτών
+        <Text style={[styles.title, { color: textColor }]}>
+          Καλωσόρισες στη Διαδρομή
+        </Text>
+        <View
+          style={[cardStyles.titleUnderline, { backgroundColor: tintColor }]}
+        />
+
+        <Text
+          style={[
+            styles.sectionTitle,
+            { color: mutedTextColor, textAlign: "center" },
+          ]}
+        >
+          Επόμενη στάση:{" "}
+          <Text style={[cardStyles.sectionEmphasis, { color: textColor }]}>
+            Ακρόπολη σε 6 λεπτά
+          </Text>
         </Text>
         <View style={cardStyles.cardGrid}>
           {randomizedCards.map((card) => (
@@ -100,14 +109,31 @@ export default function Index() {
                 pressed && cardStyles.cardPressed,
               ]}
             >
-              <View style={cardStyles.tagPill}>
-                <Text style={cardStyles.tagText}>{card.tag}</Text>
+              <View style={cardStyles.iconSlot}>
+                <MaterialCommunityIcons
+                  name={card.iconName}
+                  size={30}
+                  color={textColor}
+                />
               </View>
               <Text style={cardStyles.cardTitle}>{card.title}</Text>
-              <Text style={cardStyles.cardBody}>{card.description}</Text>
             </Pressable>
           ))}
         </View>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push("/(tabs)/passenger")}
+          style={({ pressed }) => [
+            cardStyles.primaryButton,
+            pressed && cardStyles.primaryButtonPressed,
+          ]}
+        >
+          <Text style={cardStyles.primaryButtonText}>Συνέχισε στο Κινητό</Text>
+        </Pressable>
+      </View>
+
+      <View style={styles.svgBottom}>
+        <AthensSVG width="100%" height="100%" />
       </View>
     </ScrollView>
   );
@@ -115,49 +141,72 @@ export default function Index() {
 
 const createCardStyles = ({
   textColor,
-  mutedTextColor,
   tintColor,
   borderColor,
   surfaceColor,
-  surfaceMutedColor,
 }: HomeCardStyleProps) =>
   StyleSheet.create({
+    titleUnderline: {
+      alignSelf: "center",
+      width: "70%",
+      height: 2,
+      borderRadius: 999,
+      marginTop: 8,
+      marginBottom: 8,
+    },
+    sectionEmphasis: {
+      fontWeight: "700",
+    },
     cardGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
       gap: 12,
+      justifyContent: "space-between",
     },
     card: {
+      flex: 1,
+      minWidth: 120,
+      alignItems: "center",
+      justifyContent: "center",
       backgroundColor: surfaceColor,
-      borderRadius: 14,
+      borderRadius: 18,
       borderWidth: 1,
       borderColor,
-      padding: 14,
-      gap: 8,
+      paddingVertical: 20,
+      paddingHorizontal: 12,
+      gap: 12,
     },
     cardPressed: {
       opacity: 0.92,
       transform: [{ scale: 0.99 }],
     },
-    tagPill: {
-      alignSelf: "flex-start",
-      paddingHorizontal: 10,
-      paddingVertical: 6,
-      borderRadius: 999,
-      backgroundColor: surfaceMutedColor,
-      borderWidth: 1,
-      borderColor,
-    },
-    tagText: {
-      fontSize: 12,
-      fontWeight: "700",
-      color: tintColor,
+    iconSlot: {
+      width: 64,
+      height: 44,
+      alignItems: "center",
+      justifyContent: "center",
     },
     cardTitle: {
-      fontSize: 16,
+      fontSize: 14,
       fontWeight: "700",
       color: textColor,
+      textAlign: "center",
     },
-    cardBody: {
-      fontSize: 13,
-      color: mutedTextColor,
+    primaryButton: {
+      alignSelf: "center",
+      marginTop: 8,
+      paddingHorizontal: 22,
+      paddingVertical: 12,
+      borderRadius: 12,
+      backgroundColor: tintColor,
+    },
+    primaryButtonPressed: {
+      opacity: 0.9,
+      transform: [{ scale: 0.98 }],
+    },
+    primaryButtonText: {
+      fontSize: 15,
+      fontWeight: "700",
+      color: surfaceColor,
     },
   });
