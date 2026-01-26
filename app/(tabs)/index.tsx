@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
 
 import AthensSVG from "@/assets/svgs/Athens.svg";
@@ -16,7 +17,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import type { HomeCardStyleProps, HomeSampleCard } from "@/types/home";
 
-const SAMPLE_CARDS: HomeSampleCard[] = [
+const BASE_SAMPLE_CARDS: HomeSampleCard[] = [
   {
     id: "sample-1",
     title: "Ζωντανή Θέα",
@@ -53,6 +54,8 @@ export default function Index() {
   const surfaceColor = useThemeColor({}, "surface");
   const surfaceMutedColor = useThemeColor({}, "surfaceMuted");
   const { role, logout } = useAuth();
+  const { width } = useWindowDimensions();
+  const isMobile = width < 430;
 
   const cardStyles = useMemo(
     () =>
@@ -76,9 +79,20 @@ export default function Index() {
 
   const staffCards = useMemo(() => ROLE_CARDS[role], [role]);
   const randomizedCards = useMemo(() => {
-    const shuffled = [...SAMPLE_CARDS].sort(() => Math.random() - 0.5);
+    const cards = BASE_SAMPLE_CARDS.map((card) => {
+      if (card.id === "sample-1" && isMobile) {
+        return {
+          ...card,
+          title: "Πλησιέστερη στάση λεωφορείου",
+          description: "Βρες τη στάση και άνοιξε οδηγίες στον χάρτη.",
+          tag: "Στάση",
+        };
+      }
+      return card;
+    });
+    const shuffled = [...cards].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, 3);
-  }, []);
+  }, [isMobile]);
 
   return (
     <ScrollView
