@@ -1,6 +1,6 @@
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import { useRouter } from "expo-router";
 
 import { ROLE_LABELS } from "@/constants/auth";
 import { useAuth } from "@/hooks/use-auth";
@@ -88,7 +88,7 @@ export default function LoginScreen() {
           <Text style={styles.primaryButtonText}>Σύνδεση</Text>
         </Pressable>
         <Text style={styles.helperText}>
-          Δοκιμαστικά στοιχεία: admin/admin123, driver/driver123,
+          Δοκιμαστικά στοιχεία: driver/driver123,
           employee/employee123
         </Text>
         <View style={styles.statusRow}>
