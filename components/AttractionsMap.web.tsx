@@ -10,7 +10,7 @@ const buildHtml = (latitude: number, longitude: number, markersJson: string) => 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-      html, body, #map { height: 100%; margin: 0; }
+      html, body, #map { height: 100%; width: 100%; margin: 0; }
     </style>
   </head>
   <body>
@@ -26,6 +26,10 @@ const buildHtml = (latitude: number, longitude: number, markersJson: string) => 
       markers.forEach((marker) => {
         L.marker([marker.latitude, marker.longitude]).addTo(map).bindPopup(marker.title);
       });
+      const resizeMap = () => map.invalidateSize();
+      window.addEventListener("load", () => setTimeout(resizeMap, 0));
+      window.addEventListener("resize", resizeMap);
+      setTimeout(resizeMap, 200);
     </script>
   </body>
 </html>`;
@@ -52,10 +56,11 @@ export default function AttractionsMap({ region, markers }: AttractionsMapProps)
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, alignSelf: "stretch" },
   iframe: {
     width: "100%",
     height: "100%",
     borderWidth: 0,
+    display: "block",
   },
 });

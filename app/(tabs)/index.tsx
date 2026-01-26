@@ -31,7 +31,7 @@ const SAMPLE_CARDS: HomeSampleCard[] = [
     description: "Παράγγειλε ρόφημα πριν την επόμενη στάση.",
     tag: "Ρόφημα",
     iconName: "coffee",
-    route: "/(tabs)/passenger/cafe-orders",
+    route: "/(tabs)/passenger/nearby-coffee-shops",
   },
 ];
 

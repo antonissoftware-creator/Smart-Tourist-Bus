@@ -1,4 +1,5 @@
 import { Stack } from "expo-router";
+import { View } from "react-native";
 
 import { AppProviders } from "@/components/AppProviders";
 import { AppSafeArea } from "@/components/AppSafeArea";
@@ -7,15 +8,26 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 export default function RootLayout() {
   const backgroundColor = useThemeColor({}, "background");
   const textColor = useThemeColor({}, "text");
+  const tintColor = useThemeColor({}, "tint");
 
   return (
     <AppProviders>
       <AppSafeArea>
         <Stack
           screenOptions={{
-            headerStyle: { backgroundColor },
-            headerTintColor: textColor,
-            headerTitleStyle: { fontWeight: "600", color: textColor },
+            headerStyle: { backgroundColor: textColor },
+            headerBackground: () => (
+              <View
+                style={{
+                  flex: 1,
+                  backgroundColor: textColor,
+                  borderBottomColor: tintColor,
+                  borderBottomWidth: 2,
+                }}
+              />
+            ),
+            headerTintColor: backgroundColor,
+            headerTitleStyle: { fontWeight: "600", color: backgroundColor },
             contentStyle: { backgroundColor },
           }}
         >
@@ -25,51 +37,55 @@ export default function RootLayout() {
           />
           <Stack.Screen
             name="(tabs)/climate-control/index"
-            options={{ title: "Climate Control" }}
+            options={{ title: "Έλεγχος Κλίματος" }}
           />
           <Stack.Screen
             name="(tabs)/driver/index"
-            options={{ title: "Driver Console" }}
+            options={{ title: "Πίνακας Οδηγού" }}
           />
           <Stack.Screen
             name="(tabs)/driver/assistance"
-            options={{ title: "Driver Assistance" }}
+            options={{ title: "Υποβοήθηση Οδηγού" }}
           />
           <Stack.Screen
             name="(tabs)/employee-control/index"
-            options={{ title: "Employee Control" }}
+            options={{ title: "Έλεγχος Προσωπικού" }}
           />
           <Stack.Screen
             name="(tabs)/energy-dashboard/index"
-            options={{ title: "Energy Dashboard" }}
+            options={{ title: "Πίνακας Ενέργειας" }}
           />
           <Stack.Screen
             name="(tabs)/interactions/index"
-            options={{ title: "Rider Interactions" }}
+            options={{ title: "Αλληλεπιδράσεις Επιβατών" }}
           />
           <Stack.Screen
             name="(tabs)/passenger/index"
-            options={{ title: "Passenger Hub" }}
+            options={{ title: "Ζωντανή θέα" }}
           />
           <Stack.Screen
             name="(tabs)/passenger/nearby-attractions"
-            options={{ title: "Nearby Attractions" }}
+            options={{ title: "Κοντινά Αξιοθέατα" }}
+          />
+          <Stack.Screen
+            name="(tabs)/passenger/nearby-coffee-shops"
+            options={{ title: "Κοντινά Καφέ" }}
           />
           <Stack.Screen
             name="(tabs)/passenger/route-view"
-            options={{ title: "Route View" }}
+            options={{ title: "Προβολή Διαδρομής" }}
           />
           <Stack.Screen
             name="(tabs)/passenger/city-navigation"
-            options={{ title: "City Navigation" }}
+            options={{ title: "Πλοήγηση Πόλης" }}
           />
           <Stack.Screen
             name="(tabs)/passenger/cafe-orders"
-            options={{ title: "Cafe Orders" }}
+            options={{ title: "Παραγγελία Καφέ" }}
           />
           <Stack.Screen
             name="(tabs)/robot-vacuum/index"
-            options={{ title: "Robot Vacuum" }}
+            options={{ title: "Ρομπότ Καθαρισμού" }}
           />
         </Stack>
       </AppSafeArea>

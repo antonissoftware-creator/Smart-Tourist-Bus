@@ -1,4 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
 import { useMemo, useRef, useState } from "react";
 import {
@@ -37,6 +38,8 @@ const renderCartItemPrice = (price: number, quantity: number) =>
   formatPrice(price * quantity);
 
 export default function PassengerCafeOrders() {
+  const params = useLocalSearchParams();
+  const shopName = typeof params.shop === "string" ? params.shop : "";
   const { width } = useWindowDimensions();
   const backgroundColor = useThemeColor({}, "background");
   const textColor = useThemeColor({}, "text");
@@ -436,6 +439,17 @@ export default function PassengerCafeOrders() {
                   placeholderTextColor={mutedTextColor}
                   style={styles.input}
                 />
+              </View>
+              <View style={styles.formRow}>
+                <Text style={styles.inputLabel}>Κατάστημα</Text>
+                <View style={styles.shopCard}>
+                  <Text style={styles.shopTitle}>
+                    {shopName || "Δεν έχει επιλεγεί κατάστημα"}
+                  </Text>
+                  <Text style={styles.shopSubtitle}>
+                    Παραλαβή στην επόμενη στάση
+                  </Text>
+                </View>
               </View>
               <View style={styles.formRow}>
                 <Text style={styles.inputLabel}>Σημειώσεις</Text>
@@ -961,6 +975,24 @@ const createStyles = ({
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
+    },
+    shopCard: {
+      borderRadius: 14,
+      borderWidth: 1,
+      borderColor,
+      backgroundColor: surfaceColor,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      gap: 4,
+    },
+    shopTitle: {
+      fontSize: 14,
+      fontWeight: "700",
+      color: textColor,
+    },
+    shopSubtitle: {
+      fontSize: 12,
+      color: mutedTextColor,
     },
     summaryLabel: {
       fontSize: 13,
