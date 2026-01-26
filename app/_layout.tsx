@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import { View } from "react-native";
+import { View, useWindowDimensions } from "react-native";
 
 import { AppProviders } from "@/components/AppProviders";
 import { AppSafeArea } from "@/components/AppSafeArea";
@@ -9,6 +9,11 @@ export default function RootLayout() {
   const backgroundColor = useThemeColor({}, "background");
   const textColor = useThemeColor({}, "text");
   const tintColor = useThemeColor({}, "tint");
+  const { width } = useWindowDimensions();
+  const isMobile = width < 430;
+  const passengerTitle = isMobile
+    ? "Πλησιέστερη στάση λεωφορείου"
+    : "Ζωντανή θέα";
 
   return (
     <AppProviders>
@@ -69,7 +74,7 @@ export default function RootLayout() {
           />
           <Stack.Screen
             name="(tabs)/passenger/index"
-            options={{ title: "Ζωντανή θέα" }}
+            options={{ title: passengerTitle }}
           />
           <Stack.Screen
             name="(tabs)/passenger/nearby-attractions"
