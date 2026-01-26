@@ -11,6 +11,7 @@ import {
 } from "react-native";
 
 import AthensSVG from "@/assets/svgs/Athens.svg";
+import { OnlineHelpButton } from "@/components/OnlineHelpButton";
 import { ROLE_CARDS, ROLE_LABELS } from "@/constants/auth";
 import { styles } from "@/constants/home-styles";
 import { useAuth } from "@/hooks/use-auth";
@@ -103,6 +104,12 @@ export default function Index() {
         <Text style={[styles.title, { color: textColor }]}>
           Καλωσόρισες στη Διαδρομή
         </Text>
+        <View style={cardStyles.helpButtonRow}>
+          <OnlineHelpButton
+            variant="pill"
+            onPress={() => router.push("/help")}
+          />
+        </View>
         <View
           style={[cardStyles.titleUnderline, { backgroundColor: tintColor }]}
         />
@@ -287,6 +294,10 @@ const createCardStyles = ({
     staffSection: {
       gap: 12,
       marginTop: 8,
+    },
+    helpButtonRow: {
+      alignItems: "center",
+      marginTop: 6,
     },
     sectionHeading: {
       fontSize: 16,

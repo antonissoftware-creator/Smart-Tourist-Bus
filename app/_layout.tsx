@@ -1,14 +1,16 @@
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { View, useWindowDimensions } from "react-native";
 
 import { AppProviders } from "@/components/AppProviders";
 import { AppSafeArea } from "@/components/AppSafeArea";
+import { OnlineHelpButton } from "@/components/OnlineHelpButton";
 import { useThemeColor } from "@/hooks/use-theme-color";
 
 export default function RootLayout() {
   const backgroundColor = useThemeColor({}, "background");
   const textColor = useThemeColor({}, "text");
   const tintColor = useThemeColor({}, "tint");
+  const router = useRouter();
   const { width } = useWindowDimensions();
   const isMobile = width < 430;
   const passengerTitle = isMobile
@@ -34,6 +36,14 @@ export default function RootLayout() {
             headerTintColor: backgroundColor,
             headerTitleStyle: { fontWeight: "600", color: backgroundColor },
             contentStyle: { backgroundColor },
+            headerRight: () => (
+              <OnlineHelpButton
+                variant="icon"
+                tone="inverse"
+                accessibilityLabel="Online βοήθεια"
+                onPress={() => router.push("/help")}
+              />
+            ),
           }}
         >
           <Stack.Screen
@@ -99,6 +109,10 @@ export default function RootLayout() {
           <Stack.Screen
             name="(tabs)/robot-vacuum/index"
             options={{ title: "Ρομπότ Καθαρισμού" }}
+          />
+          <Stack.Screen
+            name="help"
+            options={{ title: "Online Βοήθεια", headerRight: () => null }}
           />
         </Stack>
       </AppSafeArea>
