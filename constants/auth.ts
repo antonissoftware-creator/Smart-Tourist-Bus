@@ -36,7 +36,7 @@ const DRIVER_CARDS: HomeSampleCard[] = [
     description: "Βασικά εργαλεία οδήγησης.",
     tag: "Οδηγός",
     iconName: "bus",
-    route: "/(tabs)/driver",
+    route: "/(tabs)/driver/assistance",
   },
   {
     id: "driver-climate",
