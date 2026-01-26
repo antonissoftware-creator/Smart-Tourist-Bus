@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import {
   maintenanceItems,
@@ -95,22 +96,27 @@ export default function RobotVacuum() {
   const surfaceMutedColor = useThemeColor({}, "surfaceMuted");
   const textColor = useThemeColor({}, "text");
   const mutedTextColor = useThemeColor({}, "mutedText");
-  const tintColor = useThemeColor({}, "tint");
   const borderColor = useThemeColor({}, "border");
   const iconColor = useThemeColor({}, "icon");
+  const successColor = useThemeColor({}, "success");
+  const warningColor = useThemeColor({}, "warning");
+  const dangerColor = useThemeColor({}, "danger");
+  const infoColor = useThemeColor({}, "info");
+  const accentColor = useThemeColor({}, "accent");
 
   const cardBorder = withAlpha(borderColor, 0.7);
-  const tintSoft = withAlpha(tintColor, 0.12);
-  const tintStrong = withAlpha(tintColor, 0.28);
+  const infoSoft = withAlpha(infoColor, 0.12);
 
   const statusAccent = (status: VacuumRunStatus) => {
     switch (status) {
       case "cleaning":
-        return tintColor;
+        return infoColor;
       case "paused":
-        return textColor;
+        return warningColor;
       case "returning":
-        return tintColor;
+        return accentColor;
+      case "docked":
+        return successColor;
       default:
         return iconColor;
     }
@@ -119,9 +125,11 @@ export default function RobotVacuum() {
   const meterAccent = (status: VacuumMeterStatus) => {
     switch (status) {
       case "critical":
-        return textColor;
+        return dangerColor;
       case "attention":
-        return tintColor;
+        return warningColor;
+      case "good":
+        return successColor;
       default:
         return iconColor;
     }
@@ -130,11 +138,11 @@ export default function RobotVacuum() {
   const zoneAccent = (status: VacuumZoneStatus) => {
     switch (status) {
       case "in-progress":
-        return tintColor;
+        return infoColor;
       case "done":
-        return iconColor;
+        return successColor;
       case "skipped":
-        return textColor;
+        return warningColor;
       default:
         return mutedTextColor;
     }
@@ -143,9 +151,11 @@ export default function RobotVacuum() {
   const maintenanceAccent = (status: MaintenanceStatus) => {
     switch (status) {
       case "overdue":
-        return textColor;
+        return dangerColor;
       case "soon":
-        return tintColor;
+        return warningColor;
+      case "ok":
+        return successColor;
       default:
         return iconColor;
     }
@@ -154,12 +164,27 @@ export default function RobotVacuum() {
   const alertAccent = (severity: VacuumAlertSeverity) => {
     switch (severity) {
       case "critical":
-        return textColor;
+        return dangerColor;
       case "warning":
-        return tintColor;
+        return warningColor;
       default:
-        return iconColor;
+        return infoColor;
     }
+  };
+
+  const [runStatus, setRunStatus] = useState<VacuumRunStatus>(robotVacuumSummary.status);
+  const [cycleProgress, setCycleProgress] = useState(robotVacuumSummary.cycleProgress);
+
+  useEffect(() => {
+    if (runStatus !== "cleaning") return undefined;
+    const interval = setInterval(() => {
+      setCycleProgress((prev) => (prev >= 100 ? 0 : Math.min(prev + 4, 100)));
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [runStatus]);
+
+  const toggleRunStatus = () => {
+    setRunStatus((prev) => (prev === "cleaning" ? "paused" : "cleaning"));
   };
 
   return (
@@ -171,22 +196,46 @@ export default function RobotVacuum() {
       >
         <View style={styles.heroLeft}>
           <Text style={[styles.label, { color: mutedTextColor }]}>Ρομπότ καθαρισμού</Text>
-          <Text style={[styles.heroTitle, { color: textColor }]}>
-            {robotVacuumSummary.robotName}
-          </Text>
-          <Text style={[styles.heroSubtitle, { color: mutedTextColor }]}>
-            {robotVacuumSummary.model}
-          </Text>
+          <View style={styles.heroHeaderRow}>
+            <View style={[styles.heroIcon, { backgroundColor: accentColor }]}>
+              <MaterialCommunityIcons name="robot" size={22} color={backgroundColor} />
+            </View>
+            <View style={styles.heroHeaderText}>
+              <Text style={[styles.heroTitle, { color: textColor }]}>
+                {robotVacuumSummary.robotName}
+              </Text>
+              <Text style={[styles.heroSubtitle, { color: mutedTextColor }]}>
+                {robotVacuumSummary.model}
+              </Text>
+            </View>
+            <Pressable
+              accessibilityRole="button"
+              onPress={toggleRunStatus}
+              style={({ pressed }) => [
+                styles.heroControl,
+                { backgroundColor: runStatus === "cleaning" ? warningColor : successColor, opacity: pressed ? 0.85 : 1 },
+              ]}
+            >
+              <MaterialCommunityIcons
+                name={runStatus === "cleaning" ? "pause" : "play"}
+                size={18}
+                color={backgroundColor}
+              />
+            </Pressable>
+          </View>
           <View style={styles.statusRow}>
             <View
               style={[
                 styles.statusPill,
-                { backgroundColor: tintSoft, borderColor: tintStrong },
+                {
+                  backgroundColor: withAlpha(statusAccent(runStatus), 0.12),
+                  borderColor: statusAccent(runStatus),
+                },
               ]}
             >
-              <Text style={[styles.statusText, { color: statusAccent(robotVacuumSummary.status) }]}
+              <Text style={[styles.statusText, { color: statusAccent(runStatus) }]}
               >
-                {runStatusLabel(robotVacuumSummary.status)}
+                {runStatusLabel(runStatus)}
               </Text>
             </View>
             <Text style={[styles.statusHint, { color: mutedTextColor }]}>
@@ -201,22 +250,22 @@ export default function RobotVacuum() {
               style={[
                 styles.progressFill,
                 {
-                  width: `${robotVacuumSummary.cycleProgress}%`,
-                  backgroundColor: statusAccent(robotVacuumSummary.status),
+                  width: `${cycleProgress}%`,
+                  backgroundColor: statusAccent(runStatus),
                 },
               ]}
             />
           </View>
           <View style={styles.progressMeta}>
             <Text style={[styles.progressLabel, { color: mutedTextColor }]}>
-              Πρόοδος {robotVacuumSummary.cycleProgress}%
+              Πρόοδος {cycleProgress}%
             </Text>
             <Text style={[styles.progressLabel, { color: mutedTextColor }]}>
               Ολοκλήρωση {robotVacuumSummary.estimatedFinish}
             </Text>
           </View>
         </View>
-        <View style={[styles.heroRight, { backgroundColor: tintSoft }]}>
+        <View style={[styles.heroRight, { backgroundColor: infoSoft }]}>
           <Text style={[styles.label, { color: mutedTextColor }]}>Τελευταία ενημέρωση</Text>
           <Text style={[styles.heroValueSmall, { color: textColor }]}>
             {robotVacuumSummary.lastUpdate}
@@ -343,7 +392,12 @@ export default function RobotVacuum() {
                   <View style={[styles.zoneDot, { backgroundColor: accent }]} />
                   <Text style={[styles.zoneTitle, { color: textColor }]}>{zone.name}</Text>
                 </View>
-                <View style={[styles.statusPill, { backgroundColor: tintSoft, borderColor: tintStrong }]}>
+                <View
+                  style={[
+                    styles.statusPill,
+                    { backgroundColor: withAlpha(accent, 0.12), borderColor: accent },
+                  ]}
+                >
                   <Text style={[styles.statusText, { color: accent }]}>{zoneStatusLabel(zone.status)}</Text>
                 </View>
               </View>
@@ -382,7 +436,12 @@ export default function RobotVacuum() {
             >
               <View style={styles.maintenanceHeader}>
                 <Text style={[styles.maintenanceTitle, { color: textColor }]}>{item.title}</Text>
-                <View style={[styles.statusPill, { backgroundColor: tintSoft, borderColor: tintStrong }]}>
+                <View
+                  style={[
+                    styles.statusPill,
+                    { backgroundColor: withAlpha(accent, 0.12), borderColor: accent },
+                  ]}
+                >
                   <Text style={[styles.statusText, { color: accent }]}>{maintenanceStatusLabel(item.status)}</Text>
                 </View>
               </View>
@@ -421,7 +480,12 @@ export default function RobotVacuum() {
                 <Text style={[styles.alertTime, { color: mutedTextColor }]}>
                   {alert.time}
                 </Text>
-                <View style={[styles.statusPill, { backgroundColor: tintSoft, borderColor: tintStrong }]}>
+                <View
+                  style={[
+                    styles.statusPill,
+                    { backgroundColor: withAlpha(accent, 0.12), borderColor: accent },
+                  ]}
+                >
                   <Text style={[styles.statusText, { color: accent }]}>{alertSeverityLabel(alert.severity)}</Text>
                 </View>
               </View>
@@ -435,14 +499,14 @@ export default function RobotVacuum() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 24,
-    paddingBottom: 40,
+    padding: 20,
+    paddingBottom: 32,
     gap: 20,
   },
   heroCard: {
-    borderRadius: 24,
+    borderRadius: 18,
     borderWidth: 1,
-    padding: 20,
+    padding: 18,
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 16,
@@ -453,11 +517,35 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   heroRight: {
-    borderRadius: 20,
+    borderRadius: 14,
     padding: 16,
     gap: 8,
     minWidth: 180,
     flex: 1,
+  },
+  heroHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    flexWrap: "wrap",
+  },
+  heroIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  heroHeaderText: {
+    flex: 1,
+    minWidth: 140,
+  },
+  heroControl: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
   },
   heroTitle: {
     fontSize: 26,
@@ -476,8 +564,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    letterSpacing: 0.3,
-    textTransform: "uppercase",
+    fontWeight: "600",
   },
   statusRow: {
     flexDirection: "row",
@@ -516,7 +603,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   card: {
-    borderRadius: 20,
+    borderRadius: 18,
     borderWidth: 1,
     padding: 16,
     gap: 12,
@@ -547,7 +634,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   meterCard: {
-    borderRadius: 18,
+    borderRadius: 16,
     borderWidth: 1,
     padding: 14,
     width: "48%",
@@ -555,8 +642,6 @@ const styles = StyleSheet.create({
   },
   meterLabel: {
     fontSize: 12,
-    textTransform: "uppercase",
-    letterSpacing: 0.2,
   },
   meterValue: {
     fontSize: 22,
@@ -575,7 +660,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   metricCard: {
-    borderRadius: 18,
+    borderRadius: 16,
     borderWidth: 1,
     padding: 16,
     width: "48%",
@@ -583,8 +668,6 @@ const styles = StyleSheet.create({
   },
   metricLabel: {
     fontSize: 12,
-    textTransform: "uppercase",
-    letterSpacing: 0.2,
   },
   metricValue: {
     fontSize: 18,
@@ -597,7 +680,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   zoneCard: {
-    borderRadius: 18,
+    borderRadius: 16,
     borderWidth: 1,
     padding: 16,
     gap: 10,
@@ -634,7 +717,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   maintenanceCard: {
-    borderRadius: 18,
+    borderRadius: 16,
     borderWidth: 1,
     padding: 16,
     gap: 8,
@@ -657,7 +740,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   alertCard: {
-    borderRadius: 18,
+    borderRadius: 16,
     borderWidth: 1,
     padding: 16,
     gap: 8,

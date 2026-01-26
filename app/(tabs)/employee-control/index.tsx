@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import {
@@ -30,20 +31,25 @@ export default function EmployeeControl() {
   const surfaceMutedColor = useThemeColor({}, "surfaceMuted");
   const textColor = useThemeColor({}, "text");
   const mutedTextColor = useThemeColor({}, "mutedText");
-  const tintColor = useThemeColor({}, "tint");
   const borderColor = useThemeColor({}, "border");
   const iconColor = useThemeColor({}, "icon");
+  const successColor = useThemeColor({}, "success");
+  const warningColor = useThemeColor({}, "warning");
+  const dangerColor = useThemeColor({}, "danger");
+  const infoColor = useThemeColor({}, "info");
+  const accentColor = useThemeColor({}, "accent");
 
   const cardBorder = withAlpha(borderColor, 0.7);
-  const tintSoft = withAlpha(tintColor, 0.12);
-  const tintStrong = withAlpha(tintColor, 0.3);
+  const infoSoft = withAlpha(infoColor, 0.12);
 
   const coverageAccent = (status: CoverageStatus) => {
     switch (status) {
       case "critical":
-        return textColor;
+        return dangerColor;
       case "thin":
-        return tintColor;
+        return warningColor;
+      case "ok":
+        return successColor;
       default:
         return iconColor;
     }
@@ -52,13 +58,13 @@ export default function EmployeeControl() {
   const staffAccent = (status: StaffStatus) => {
     switch (status) {
       case "on-duty":
-        return tintColor;
+        return successColor;
       case "support":
-        return textColor;
+        return infoColor;
       case "training":
-        return iconColor;
+        return warningColor;
       case "break":
-        return mutedTextColor;
+        return accentColor;
       default:
         return mutedTextColor;
     }
@@ -67,11 +73,11 @@ export default function EmployeeControl() {
   const alertAccent = (severity: AlertSeverity) => {
     switch (severity) {
       case "urgent":
-        return textColor;
+        return dangerColor;
       case "attention":
-        return tintColor;
+        return warningColor;
       default:
-        return iconColor;
+        return infoColor;
     }
   };
 
@@ -91,9 +97,30 @@ export default function EmployeeControl() {
       contentContainerStyle={[styles.container, { backgroundColor }]}
       showsVerticalScrollIndicator={false}
     >
-      <View style={[styles.heroCard, { backgroundColor: surfaceColor, borderColor: cardBorder }]}
-      >
+      <View style={[styles.heroCard, { backgroundColor: surfaceColor, borderColor: cardBorder }]}>
         <View style={styles.heroLeft}>
+          <View style={styles.heroHeaderRow}>
+            <View style={[styles.heroIcon, { backgroundColor: infoColor }]}>
+              <MaterialCommunityIcons name="account-group" size={22} color={backgroundColor} />
+            </View>
+            <View style={styles.heroHeaderText}>
+              <Text style={[styles.heroTitle, { color: textColor }]}>Κέντρο Πληρώματος</Text>
+              <Text style={[styles.heroSubtitle, { color: mutedTextColor }]}>Ζωντανή εποπτεία προσωπικού</Text>
+            </View>
+            {(() => {
+              const readinessAccent = coverageAccent(crewSummary.readinessStatus);
+              return (
+                <View
+                  style={[
+                    styles.statusPill,
+                    { borderColor: readinessAccent, backgroundColor: withAlpha(readinessAccent, 0.12) },
+                  ]}
+                >
+                  <Text style={[styles.statusText, { color: readinessAccent }]}>{crewSummary.readinessLabel}</Text>
+                </View>
+              );
+            })()}
+          </View>
           <Text style={[styles.label, { color: mutedTextColor }]}>Προσωπικό εντός οχήματος</Text>
           <Text style={[styles.heroValue, { color: textColor }]}
           >
@@ -108,8 +135,7 @@ export default function EmployeeControl() {
             Επόμενη αλλαγή {crewSummary.nextChangeover}
           </Text>
         </View>
-        <View style={[styles.heroRight, { backgroundColor: tintSoft }]}
-        >
+        <View style={[styles.heroRight, { backgroundColor: infoSoft }]}>
           <Text style={[styles.label, { color: mutedTextColor }]}>Τελευταία ενημέρωση</Text>
           <Text style={[styles.heroValueSmall, { color: textColor }]}
           >
@@ -262,7 +288,10 @@ export default function EmployeeControl() {
           return (
             <View
               key={alert.id}
-              style={[styles.alertCard, { backgroundColor: surfaceMutedColor, borderColor: cardBorder }]}
+              style={[
+                styles.alertCard,
+                { backgroundColor: withAlpha(accent, 0.08), borderColor: accent },
+              ]}
             >
               <View style={styles.alertHeader}>
                 <View style={[styles.dot, { backgroundColor: accent }]} />
@@ -299,10 +328,10 @@ export default function EmployeeControl() {
         {dutyTasks.map((task) => {
           const accent =
             task.status === "done"
-              ? iconColor
+              ? successColor
               : task.status === "in-progress"
-              ? tintColor
-              : mutedTextColor;
+              ? infoColor
+              : warningColor;
           return (
             <View
               key={task.id}
@@ -344,24 +373,6 @@ const styles = StyleSheet.create({
     paddingBottom: 36,
     gap: 20,
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: 16,
-  },
-  headerText: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: "700",
-  },
-  subtitle: {
-    marginTop: 6,
-    fontSize: 14,
-    lineHeight: 20,
-  },
   statusPill: {
     paddingVertical: 6,
     paddingHorizontal: 12,
@@ -382,11 +393,38 @@ const styles = StyleSheet.create({
   },
   heroLeft: {
     flex: 1,
+    gap: 10,
   },
   heroRight: {
     borderRadius: 14,
     padding: 14,
     alignSelf: "flex-start",
+    gap: 6,
+  },
+  heroHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    flexWrap: "wrap",
+  },
+  heroIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  heroHeaderText: {
+    flex: 1,
+    minWidth: 160,
+  },
+  heroTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  heroSubtitle: {
+    fontSize: 12,
+    marginTop: 4,
   },
   heroValue: {
     fontSize: 34,
@@ -399,10 +437,8 @@ const styles = StyleSheet.create({
   heroValueSmall: {
     fontSize: 16,
     fontWeight: "600",
-    marginTop: 6,
   },
   heroHint: {
-    marginTop: 8,
     fontSize: 12,
     lineHeight: 16,
   },
@@ -418,8 +454,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    textTransform: "uppercase",
-    letterSpacing: 0.4,
+    fontWeight: "600",
   },
   value: {
     fontSize: 14,
@@ -506,8 +541,6 @@ const styles = StyleSheet.create({
   statusTextSmall: {
     fontSize: 11,
     fontWeight: "600",
-    textTransform: "uppercase",
-    letterSpacing: 0.4,
   },
   dot: {
     width: 8,
@@ -540,8 +573,6 @@ const styles = StyleSheet.create({
   alertLabel: {
     fontSize: 11,
     fontWeight: "600",
-    textTransform: "uppercase",
-    letterSpacing: 0.4,
   },
   taskCard: {
     borderRadius: 14,
@@ -574,7 +605,5 @@ const styles = StyleSheet.create({
   taskStatus: {
     fontSize: 12,
     fontWeight: "600",
-    textTransform: "uppercase",
-    letterSpacing: 0.4,
   },
 });

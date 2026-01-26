@@ -24,7 +24,7 @@ const BASE_SAMPLE_CARDS: HomeSampleCard[] = [
     description: "Απόλαυσε τη διαδρομή σε πραγματικό χρόνο.",
     tag: "Ζωντανά",
     iconName: "eye",
-    route: "/(tabs)/passenger",
+    route: "/(tabs)/passenger/route-view",
   },
   {
     id: "sample-2",

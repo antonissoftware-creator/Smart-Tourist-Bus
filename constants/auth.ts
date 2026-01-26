@@ -36,7 +36,7 @@ const DRIVER_CARDS: HomeSampleCard[] = [
     description: "Βασικά εργαλεία οδήγησης.",
     tag: "Οδηγός",
     iconName: "bus",
-    route: "/(tabs)/driver/assistance",
+    route: "/(tabs)/driver",
   },
   {
     id: "driver-climate",
@@ -63,7 +63,7 @@ const EMPLOYEE_CARDS: HomeSampleCard[] = [
     description: "Κατάσταση κατανάλωσης και φόρτισης.",
     tag: "Ενέργεια",
     iconName: "battery-charging",
-    route: "/(tabs)/energy-dashboard",
+    route: "/(tabs)/staff",
   },
   {
     id: "employee-robot",

@@ -65,6 +65,10 @@ export default function RootLayout() {
             options={{ title: "Έλεγχος Προσωπικού" }}
           />
           <Stack.Screen
+            name="(tabs)/staff/index"
+            options={{ title: "Πίνακας Υπαλλήλων" }}
+          />
+          <Stack.Screen
             name="(tabs)/energy-dashboard/index"
             options={{ title: "Πίνακας Ενέργειας" }}
           />
@@ -73,7 +77,7 @@ export default function RootLayout() {
             options={{ title: "Αλληλεπιδράσεις Επιβατών" }}
           />
           <Stack.Screen
-            name="(tabs)/passenger/index"
+            name="(tabs)/passenger/route-view"
             options={{ title: passengerTitle }}
           />
           <Stack.Screen
@@ -83,10 +87,6 @@ export default function RootLayout() {
           <Stack.Screen
             name="(tabs)/passenger/nearby-coffee-shops"
             options={{ title: "Κοντινά Καφέ" }}
-          />
-          <Stack.Screen
-            name="(tabs)/passenger/route-view"
-            options={{ title: "Προβολή Διαδρομής" }}
           />
           <Stack.Screen
             name="(tabs)/passenger/city-navigation"
