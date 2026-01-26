@@ -164,7 +164,7 @@ export default function Index() {
 
         <Pressable
           accessibilityRole="button"
-          onPress={() => router.push("/(tabs)/passenger")}
+          onPress={() => router.push("/(tabs)/mobile-qr")}
           style={({ pressed }) => [
             cardStyles.primaryButton,
             pressed && cardStyles.primaryButtonPressed,

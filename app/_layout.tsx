@@ -36,6 +36,10 @@ export default function RootLayout() {
             options={{ title: "Smart Tourist Bus", headerShown: false }}
           />
           <Stack.Screen
+            name="(tabs)/mobile-qr"
+            options={{ title: "Συνέχισε στο Κινητό" }}
+          />
+          <Stack.Screen
             name="login"
             options={{ title: "Σύνδεση Προσωπικού" }}
           />
