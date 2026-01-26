@@ -1,10 +1,18 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useMemo } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import AthensSVG from "@/assets/svgs/Athens.svg";
+import { ROLE_CARDS, ROLE_LABELS } from "@/constants/auth";
 import { styles } from "@/constants/home-styles";
+import { useAuth } from "@/hooks/use-auth";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import type { HomeCardStyleProps, HomeSampleCard } from "@/types/home";
 
@@ -44,6 +52,7 @@ export default function Index() {
   const borderColor = useThemeColor({}, "border");
   const surfaceColor = useThemeColor({}, "surface");
   const surfaceMutedColor = useThemeColor({}, "surfaceMuted");
+  const { role, logout } = useAuth();
 
   const cardStyles = useMemo(
     () =>
@@ -65,6 +74,7 @@ export default function Index() {
     ],
   );
 
+  const staffCards = useMemo(() => ROLE_CARDS[role], [role]);
   const randomizedCards = useMemo(() => {
     const shuffled = [...SAMPLE_CARDS].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, 3);
@@ -120,6 +130,38 @@ export default function Index() {
             </Pressable>
           ))}
         </View>
+
+        {staffCards.length > 0 ? (
+          <View style={cardStyles.staffSection}>
+            <View style={cardStyles.cardGrid}>
+              {staffCards.map((card) => (
+                <Pressable
+                  key={card.id}
+                  accessibilityRole="button"
+                  onPress={() => {
+                    if (card.route) {
+                      router.push(card.route);
+                    }
+                  }}
+                  style={({ pressed }) => [
+                    cardStyles.card,
+                    pressed && cardStyles.cardPressed,
+                  ]}
+                >
+                  <View style={cardStyles.iconSlot}>
+                    <MaterialCommunityIcons
+                      name={card.iconName}
+                      size={30}
+                      color={textColor}
+                    />
+                  </View>
+                  <Text style={cardStyles.cardTitle}>{card.title}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+        ) : null}
+
         <Pressable
           accessibilityRole="button"
           onPress={() => router.push("/(tabs)/passenger")}
@@ -130,6 +172,39 @@ export default function Index() {
         >
           <Text style={cardStyles.primaryButtonText}>Συνέχισε στο Κινητό</Text>
         </Pressable>
+
+        {role === "guest" ? (
+          <View style={cardStyles.loginButtonRow}>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => router.push("/login")}
+              style={({ pressed }) => [
+                cardStyles.loginGhostButton,
+                pressed && cardStyles.ghostButtonPressed,
+              ]}
+            >
+              <Text style={cardStyles.loginGhostButtonText}>
+                Σύνδεση προσωπικού
+              </Text>
+            </Pressable>
+          </View>
+        ) : (
+          <View style={cardStyles.statusPanel}>
+            <Text style={cardStyles.statusText}>
+              Συνδεδεμένος ως {ROLE_LABELS[role]}.
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              onPress={logout}
+              style={({ pressed }) => [
+                cardStyles.ghostButton,
+                pressed && cardStyles.ghostButtonPressed,
+              ]}
+            >
+              <Text style={cardStyles.ghostButtonText}>Αποσύνδεση</Text>
+            </Pressable>
+          </View>
+        )}
       </View>
 
       <View style={styles.svgBottom}>
@@ -141,9 +216,11 @@ export default function Index() {
 
 const createCardStyles = ({
   textColor,
+  mutedTextColor,
   tintColor,
   borderColor,
   surfaceColor,
+  surfaceMutedColor,
 }: HomeCardStyleProps) =>
   StyleSheet.create({
     titleUnderline: {
@@ -165,7 +242,8 @@ const createCardStyles = ({
     },
     card: {
       flex: 1,
-      minWidth: 120,
+      minWidth: 250,
+      maxHeight: 120,
       alignItems: "center",
       justifyContent: "center",
       backgroundColor: surfaceColor,
@@ -191,6 +269,65 @@ const createCardStyles = ({
       fontWeight: "700",
       color: textColor,
       textAlign: "center",
+    },
+    staffSection: {
+      gap: 12,
+      marginTop: 8,
+    },
+    sectionHeading: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: textColor,
+    },
+    loginButtonRow: {
+      marginTop: 8,
+      alignItems: "center",
+    },
+    statusPanel: {
+      marginTop: 8,
+      padding: 16,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor,
+      backgroundColor: surfaceColor,
+      gap: 10,
+    },
+    statusText: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: textColor,
+    },
+    ghostButton: {
+      alignSelf: "flex-start",
+      paddingHorizontal: 18,
+      paddingVertical: 10,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor,
+      backgroundColor: surfaceMutedColor,
+    },
+    loginGhostButton: {
+      alignSelf: "center",
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor,
+      backgroundColor: surfaceMutedColor,
+    },
+    loginGhostButtonText: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: textColor,
+    },
+    ghostButtonPressed: {
+      opacity: 0.9,
+      transform: [{ scale: 0.98 }],
+    },
+    ghostButtonText: {
+      fontSize: 14,
+      fontWeight: "700",
+      color: textColor,
     },
     primaryButton: {
       alignSelf: "center",

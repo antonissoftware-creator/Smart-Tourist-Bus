@@ -36,6 +36,10 @@ export default function RootLayout() {
             options={{ title: "Smart Tourist Bus", headerShown: false }}
           />
           <Stack.Screen
+            name="login"
+            options={{ title: "Σύνδεση Προσωπικού" }}
+          />
+          <Stack.Screen
             name="(tabs)/climate-control/index"
             options={{ title: "Έλεγχος Κλίματος" }}
           />
