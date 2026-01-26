@@ -1,6 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
 import { useMemo, useRef, useState } from "react";
 import {
   FlatList,
@@ -27,6 +26,10 @@ import type {
 } from "@/types/cafe";
 
 const SERVICE_FEE = 0.5;
+const NEXT_STOP = {
+  name: "Ακρόπολη",
+  eta: "6 λεπτά",
+};
 
 const formatPrice = (value: number) => `€${value.toFixed(2)}`;
 
@@ -34,7 +37,6 @@ const renderCartItemPrice = (price: number, quantity: number) =>
   formatPrice(price * quantity);
 
 export default function PassengerCafeOrders() {
-  const router = useRouter();
   const { width } = useWindowDimensions();
   const backgroundColor = useThemeColor({}, "background");
   const textColor = useThemeColor({}, "text");
@@ -95,9 +97,12 @@ export default function PassengerCafeOrders() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState<CafeCheckoutStep>("basket");
   const [customerName, setCustomerName] = useState("");
-  const [seatNumber, setSeatNumber] = useState("");
   const [notes, setNotes] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<CafePaymentMethod>("card");
+  const [cardName, setCardName] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [cardCvv, setCardCvv] = useState("");
   const orderNumberRef = useRef("");
 
   const itemLookup = useMemo(() => {
@@ -168,6 +173,10 @@ export default function PassengerCafeOrders() {
     setCheckoutStep("checkout");
   };
 
+  const proceedToCard = () => {
+    setCheckoutStep("card");
+  };
+
   const placeOrder = () => {
     orderNumberRef.current = `#${Math.floor(1000 + Math.random() * 9000)}`;
     setCheckoutStep("success");
@@ -176,9 +185,12 @@ export default function PassengerCafeOrders() {
   const resetOrder = () => {
     setCart({});
     setCustomerName("");
-    setSeatNumber("");
     setNotes("");
     setPaymentMethod("card");
+    setCardName("");
+    setCardNumber("");
+    setCardExpiry("");
+    setCardCvv("");
     setCheckoutStep("basket");
     setIsCartOpen(false);
   };
@@ -290,6 +302,7 @@ export default function PassengerCafeOrders() {
             <Text style={styles.modalTitle}>
               {checkoutStep === "basket" && "Το καλάθι σου"}
               {checkoutStep === "checkout" && "Στοιχεία Παραγγελίας"}
+              {checkoutStep === "card" && "Πληρωμή με Κάρτα"}
               {checkoutStep === "success" && "Η παραγγελία στάλθηκε"}
             </Text>
             <Pressable
@@ -425,16 +438,6 @@ export default function PassengerCafeOrders() {
                 />
               </View>
               <View style={styles.formRow}>
-                <Text style={styles.inputLabel}>Θέση</Text>
-                <TextInput
-                  placeholder="Π.χ. 12B"
-                  value={seatNumber}
-                  onChangeText={setSeatNumber}
-                  placeholderTextColor={mutedTextColor}
-                  style={styles.input}
-                />
-              </View>
-              <View style={styles.formRow}>
                 <Text style={styles.inputLabel}>Σημειώσεις</Text>
                 <TextInput
                   placeholder="Π.χ. Χωρίς ζάχαρη"
@@ -444,6 +447,22 @@ export default function PassengerCafeOrders() {
                   multiline
                   style={[styles.input, styles.textArea]}
                 />
+              </View>
+              <View style={styles.formRow}>
+                <Text style={styles.inputLabel}>Παράδοση στην επόμενη στάση</Text>
+                <View style={styles.nextStopCard}>
+                  <View>
+                    <Text style={styles.nextStopTitle}>{NEXT_STOP.name}</Text>
+                    <Text style={styles.nextStopSubtitle}>
+                      Άφιξη σε {NEXT_STOP.eta}
+                    </Text>
+                  </View>
+                  <MaterialCommunityIcons
+                    name="map-marker"
+                    size={20}
+                    color={tintColor}
+                  />
+                </View>
               </View>
               <View style={styles.formRow}>
                 <Text style={styles.inputLabel}>Τρόπος Πληρωμής</Text>
@@ -485,6 +504,86 @@ export default function PassengerCafeOrders() {
                 </View>
                 <Pressable
                   accessibilityRole="button"
+                  onPress={proceedToCard}
+                  style={({ pressed }) => [
+                    styles.primaryButton,
+                    pressed && styles.primaryButtonPressed,
+                  ]}
+                >
+                  <Text style={styles.primaryButtonText}>
+                    Συνέχεια στην Κάρτα
+                  </Text>
+                </Pressable>
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => setCheckoutStep("basket")}
+                  style={({ pressed }) => [
+                    styles.secondaryButton,
+                    pressed && styles.secondaryButtonPressed,
+                  ]}
+                >
+                  <Text style={styles.secondaryButtonText}>Πίσω</Text>
+                </Pressable>
+              </View>
+            </ScrollView>
+          )}
+
+          {checkoutStep === "card" && (
+            <ScrollView contentContainerStyle={styles.modalContent}>
+              <View style={styles.formRow}>
+                <Text style={styles.inputLabel}>Όνομα κατόχου</Text>
+                <TextInput
+                  placeholder="Π.χ. Γ. Παπαδόπουλος"
+                  value={cardName}
+                  onChangeText={setCardName}
+                  placeholderTextColor={mutedTextColor}
+                  style={styles.input}
+                />
+              </View>
+              <View style={styles.formRow}>
+                <Text style={styles.inputLabel}>Αριθμός κάρτας</Text>
+                <TextInput
+                  placeholder="0000 0000 0000 0000"
+                  value={cardNumber}
+                  onChangeText={setCardNumber}
+                  placeholderTextColor={mutedTextColor}
+                  keyboardType="number-pad"
+                  style={styles.input}
+                />
+              </View>
+              <View style={styles.cardRow}>
+                <View style={[styles.formRow, styles.cardHalf]}>
+                  <Text style={styles.inputLabel}>Λήξη</Text>
+                  <TextInput
+                    placeholder="MM/YY"
+                    value={cardExpiry}
+                    onChangeText={setCardExpiry}
+                    placeholderTextColor={mutedTextColor}
+                    keyboardType="number-pad"
+                    style={styles.input}
+                  />
+                </View>
+                <View style={[styles.formRow, styles.cardHalf]}>
+                  <Text style={styles.inputLabel}>CVV</Text>
+                  <TextInput
+                    placeholder="123"
+                    value={cardCvv}
+                    onChangeText={setCardCvv}
+                    placeholderTextColor={mutedTextColor}
+                    keyboardType="number-pad"
+                    style={styles.input}
+                  />
+                </View>
+              </View>
+              <View style={styles.summary}>
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>Σύνολο</Text>
+                  <Text style={styles.summaryTotalValue}>
+                    {formatPrice(total)}
+                  </Text>
+                </View>
+                <Pressable
+                  accessibilityRole="button"
                   onPress={placeOrder}
                   style={({ pressed }) => [
                     styles.primaryButton,
@@ -497,7 +596,7 @@ export default function PassengerCafeOrders() {
                 </Pressable>
                 <Pressable
                   accessibilityRole="button"
-                  onPress={() => setCheckoutStep("basket")}
+                  onPress={() => setCheckoutStep("checkout")}
                   style={({ pressed }) => [
                     styles.secondaryButton,
                     pressed && styles.secondaryButtonPressed,
@@ -520,7 +619,7 @@ export default function PassengerCafeOrders() {
                 Ευχαριστούμε για την παραγγελία!
               </Text>
               <Text style={styles.successSubtitle}>
-                Θα τη λάβεις στη θέση σου σε λίγα λεπτά.
+                Θα την παραλάβεις στην επόμενη στάση.
               </Text>
               <View style={styles.successCard}>
                 <Text style={styles.successLabel}>Αριθμός παραγγελίας</Text>
@@ -528,7 +627,7 @@ export default function PassengerCafeOrders() {
                   {orderNumberRef.current}
                 </Text>
                 <Text style={styles.successMeta}>
-                  {customerName || "Επιβάτης"} · {seatNumber || "Θέση"}
+                  {customerName || "Επιβάτης"} · {NEXT_STOP.name}
                 </Text>
               </View>
               <Pressable
@@ -920,10 +1019,38 @@ const createStyles = ({
     formRow: {
       gap: 8,
     },
+    cardRow: {
+      flexDirection: "row",
+      gap: 12,
+    },
+    cardHalf: {
+      flex: 1,
+    },
     inputLabel: {
       fontSize: 13,
       fontWeight: "600",
       color: textColor,
+    },
+    nextStopCard: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor,
+      backgroundColor: surfaceColor,
+    },
+    nextStopTitle: {
+      fontSize: 14,
+      fontWeight: "700",
+      color: textColor,
+    },
+    nextStopSubtitle: {
+      fontSize: 12,
+      color: mutedTextColor,
+      marginTop: 4,
     },
     input: {
       borderWidth: 1,

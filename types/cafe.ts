@@ -24,6 +24,6 @@ export interface CafeCartEntry {
 
 export type CafeCart = Record<string, number>;
 
-export type CafeCheckoutStep = "basket" | "checkout" | "success";
+export type CafeCheckoutStep = "basket" | "checkout" | "card" | "success";
 
 export type CafePaymentMethod = "card" | "cash";
