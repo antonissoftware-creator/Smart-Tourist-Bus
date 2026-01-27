@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import AthensSVG from "@/assets/svgs/Athens.svg";
 import { styles } from "@/constants/home-styles";
@@ -24,7 +24,9 @@ export default function MobileQr() {
         <Text style={[styles.title, { color: textColor }]}>
           Καλωσόρισες στη Διαδρομή
         </Text>
-        <View style={[localStyles.titleUnderline, { backgroundColor: tintColor }]} />
+        <View
+          style={[localStyles.titleUnderline, { backgroundColor: tintColor }]}
+        />
 
         <Text
           style={[
@@ -48,9 +50,6 @@ export default function MobileQr() {
           ]}
         >
           <MaterialCommunityIcons name="qrcode" size={180} color={textColor} />
-          <Text style={[localStyles.qrCaption, { color: mutedTextColor }]}>
-            QR Κωδικός (placeholder)
-          </Text>
         </View>
 
         <Pressable
@@ -62,7 +61,9 @@ export default function MobileQr() {
             pressed && localStyles.primaryButtonPressed,
           ]}
         >
-          <Text style={[localStyles.primaryButtonText, { color: surfaceColor }]}>
+          <Text
+            style={[localStyles.primaryButtonText, { color: surfaceColor }]}
+          >
             Επιστροφή στο Menu
           </Text>
         </Pressable>
