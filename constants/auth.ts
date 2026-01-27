@@ -38,14 +38,6 @@ const DRIVER_CARDS: HomeSampleCard[] = [
     iconName: "bus",
     route: "/(tabs)/driver",
   },
-  {
-    id: "driver-climate",
-    title: "Έλεγχος Κλίματος",
-    description: "Ρύθμισε θερμοκρασία και εξαερισμό.",
-    tag: "Κλίμα",
-    iconName: "fan",
-    route: "/(tabs)/climate-control",
-  },
 ];
 
 const EMPLOYEE_CARDS: HomeSampleCard[] = [
