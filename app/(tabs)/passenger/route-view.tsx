@@ -57,13 +57,17 @@ export default function PassengerIndex() {
   const isMobile = width < 430;
   const videoSource = require("../../../assets/videos/Bus.mp4");
   const player = useVideoPlayer(videoSource, (playerInstance) => {
-    playerInstance.loop = true;
-    playerInstance.play();
+    playerInstance.muted = false;
   });
   useEffect(() => {
+    if (isMobile) {
+      player.loop = false;
+      player.pause();
+      return;
+    }
     player.loop = true;
     player.play();
-  }, [player]);
+  }, [isMobile, player]);
 
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${CURRENT_LOCATION.latitude},${CURRENT_LOCATION.longitude}&destination=${BUS_STOP.latitude},${BUS_STOP.longitude}&travelmode=walking`;
 
